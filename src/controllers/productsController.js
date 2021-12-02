@@ -89,7 +89,11 @@ const controller = {
 
 	// Delete - Delete one product from DB
 	destroy : (req, res) => {
-		// Do the magic
+		let productId = +req.params.id
+		productsFilted = products.filter(product => product.id !== productId)
+
+		writeJson(productsFilted)
+		res.redirect('/')
 	}
 };
 
