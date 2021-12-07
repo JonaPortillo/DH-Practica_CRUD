@@ -50,8 +50,9 @@ const controller = {
 			discount: discount,
 			category: category,
 			description: description,
-			image: "default-image.png"
+			image: req.file ? req.file.filename :  "default-image.png"
 		}
+		console.log(req.file)
 		products.push(newProduct)
 
 		writeJson(products)
@@ -90,9 +91,27 @@ const controller = {
 	// Delete - Delete one product from DB
 	destroy : (req, res) => {
 		let productId = +req.params.id
-		productsFilted = products.filter(product => product.id !== productId)
 
-		writeJson(productsFilted)
+		products.forEach(product => {
+			if(product.id === productId){
+				
+				if(fs.existsSync("./public/images/products/", product.image)){
+					fs.unlinkSync(`./public/images/products/${product.image}`)
+				}else{
+					console.log('No encontré el archivo')
+				}
+
+				let productToDestroyIndex = products.indexOf(product) // si lo encuentra devuelve el indice si no -1
+				if(productToDestroyIndex !== -1) {
+					products.splice(productToDestroyIndex, 1)
+				}else{  // primer parámetro es el indice del elemento a borrar, el segundo, la cantidad a eliminar 
+					console.log('No encontré el producto')
+				}
+			}
+		})
+
+
+		writeJson(products)
 		res.redirect('/')
 	}
 };
